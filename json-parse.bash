@@ -12,10 +12,6 @@
 # # Contributors
 # - Dave Eddy <ysap@daveeddy.com>
 
-_jp_idx=0
-_jp_len=0
-_jp_input=''
-
 # ws = *(
 # %x20 /              ; Space
 # %x09 /              ; Horizontal tab
@@ -526,6 +522,9 @@ json-parse() {
 	unset JSONREPLY
 
 	local LC_ALL=C.UTF-8
+	local _jp_idx=0
+	local _jp_len=0
+	local _jp_input=''
 
 	# read the data into a string
 	IFS= read -r -d '' _jp_input
@@ -585,7 +584,6 @@ json-parse() {
 		return 1
 	fi
 
-	unset _jp_idx _jp_len _jp_input
 	return 0
 }
 

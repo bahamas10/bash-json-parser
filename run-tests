@@ -6,3 +6,20 @@ for f in ./tests/*.json; do
 	echo "$f"
 	json-parse < "$f" || exit 1
 done
+
+#json-parse < ./tests/simple-boolean-true.json && echo $JSONREPLY
+echo -n "execute ./tests/simple-boolean-true.json: "
+if ! $(json-parse < ./tests/simple-boolean-true.json && echo $JSONREPLY); then
+	echo "failed"
+	exit 1
+fi
+echo "succeeded"
+
+#json-parse < ./tests/simple-boolean-false.json && echo $JSONREPLY
+echo -n "execute ./tests/simple-boolean-false.json: "
+if $(json-parse < ./tests/simple-boolean-false.json && echo $JSONREPLY); then
+	echo "failed"
+	exit 1
+fi
+echo "succeeded"
+

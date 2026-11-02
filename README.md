@@ -15,6 +15,16 @@ echo "${JSONREPLY[foo]}"
 # => "bar"
 ```
 
+YouTube
+-------
+
+Watch me build this live on YouTube.
+
+<a href="https://youtu.be/iIUH4JSJTAw"><img
+alt="Bash json parser YouTube Thumbnail"
+src="https://i.ytimg.com/vi///youtu.be/iIUH4JSJTAw/maxresdefault.jpg"
+/></a>
+
 License
 -------
 

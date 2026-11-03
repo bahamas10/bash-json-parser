@@ -197,15 +197,17 @@ _jp-parse-object() {
 					declare -Agi JSONREPLY
 					;;
 				'"') typ='string';;
+				't' | 'f') typ='boolean';;
 				*)
-					_jp-error 'objects can only contain numbers or strings'
+					_jp-error 'objects can only contain numbers or strings or booleans'
 					return 1
 					;;
 			esac
 		fi
 		case "$typ" in
-			number) value=${| _jp-parse-number; } || return 1;;
-			string) value=${| _jp-parse-string; } || return 1;;
+			number)  value=${| _jp-parse-number;  } || return 1;;
+			string)  value=${| _jp-parse-string;  } || return 1;;
+			boolean) value=${| _jp-parse-boolean; } || return 1;;
 			*) exit 1;;
 		esac
 
@@ -254,8 +256,9 @@ _jp-parse-array() {
 	case "$c" in
 		[0-9] | '-') typ='number';;
 		'"') typ='string';;
+		't' | 'f') typ='boolean';;
 		*)
-			_jp-error 'arrays can only contain numbers or strings'
+			_jp-error 'arrays can only contain numbers or strings or booleans'
 			return 1
 			;;
 	esac
@@ -264,8 +267,9 @@ _jp-parse-array() {
 	while true; do
 		_jp-skip-whitespace
 		case "$typ" in
-			number) value=${| _jp-parse-number; } || return 1;;
-			string) value=${| _jp-parse-string; } || return 1;;
+			number)  value=${| _jp-parse-number;  } || return 1;;
+			string)  value=${| _jp-parse-string;  } || return 1;;
+			boolean) value=${| _jp-parse-boolean; } || return 1;;
 			*) exit 1;;
 		esac
 		_jp-skip-whitespace
@@ -495,6 +499,30 @@ _jp-parse-number() {
 	REPLY=$parsed
 }
 
+# parses the json values 'true' and 'false' into 
+# safely executable string values in Bash
+_jp-parse-boolean() {
+	local s=${_jp_input:_jp_idx:4}
+	if [[ $s == 'true' ]]; then
+		((_jp_idx+=4))
+		REPLY="builtin true"
+		return 0
+	fi
+
+	local s=${_jp_input:_jp_idx:5}
+	if [[ $s == 'false' ]]; then
+		((_jp_idx+=5))
+		REPLY="builtin false"
+		return 0
+	fi
+
+	_jp-error "'$s' is given to _jp-parse-boolean"
+	return 1
+
+
+}
+
+
 _jp-debug() {
 	local msg=$*
 	local lhs=${_jp_input:0:_jp_idx}
@@ -566,7 +594,13 @@ json-parse() {
 		'{')
 			_jp-parse-object || return 1
 			;;
-		't' | 'f' | 'n')
+		't' | 'f')
+			local value
+			value=${| _jp-parse-boolean; } || return 1
+			declare -g JSONREPLY
+			JSONREPLY=$value
+			;;
+		'n')
 			_jp-error 'null/true/false unsupported'
 			return 1
 			;;
